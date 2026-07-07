@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيصال حجز Mohamed Farouk Photography</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <style>
+        :root { --whatsapp: #25D366; --dark: #333; }
+        body {
+            font-family: 'Tajawal', 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .receipt-container {
+            width: 750px;
+            max-width: 100%;
+            background: #ffffff;
+            border: 1px solid #000;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+            gap: 12px;
+        }
+        .qr-code-image {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            border-radius: 6px;
+            background: #fff;
+        }
+        .logo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .logo h1 {
+            font-size: 1.6rem;
+            margin: 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .logo h1 svg.icon { width: 28px; height: 28px; }
+        .logo span { font-size: 0.9em; letter-spacing: 1px; display:block; margin-top: -4px; }
+
+        .whatsapp-numbers { font-size: 0.95em; font-weight: 700; text-align: left; }
+        .whatsapp-numbers div { margin-bottom: 8px; display:flex; align-items:center; justify-content:flex-end; gap:8px; }
+        .whatsapp-numbers svg.icon { width:20px; height:20px; }
+
+        .phone-number {
+            direction: ltr;
+            unicode-bidi: embed;
+        }
+
+        .receipt-info { display:flex; justify-content:space-between; padding:10px 0; font-size:1.05em; gap:12px; }
+        .receipt-info .field { display:flex; flex-direction:column; gap:6px; }
+        .receipt-info label { font-weight:700; }
+        .receipt-info input { border:none; border-bottom:2px dotted #888; font-family:inherit; font-size:1em; padding:4px 6px; }
+        .receipt-info input:focus { outline:none; border-bottom-color:#000; }
+
+        .title-box { text-align:center; margin:15px 0 25px 0; }
+        .title-box span { background-color:#000; color:#fff; padding:10px 40px; font-size:1.6em; font-weight:700; display:inline-block; border-radius:5px; }
+
+        .content { display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+        .column { width:48%; min-width:300px; }
+        .form-row { margin-bottom:18px; display:flex; align-items:center; font-size:1.05em; gap:10px; }
+        .form-row label { font-weight:700; width:130px; min-width:130px; }
+        .form-row input[type="text"], .form-row input[type="number"] { flex-grow:1; border:none; border-bottom:2px dotted #555; padding:6px 6px; font-size:1em; direction:rtl; background:transparent; -webkit-appearance:none; -moz-appearance:textfield; font-family:inherit; }
+        .form-row input:focus { outline:none; border-bottom:2px solid #000; }
+        .form-row input::-webkit-outer-spin-button, .form-row input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+
+        #remainingAmount { background-color:#f4f4f4; border-bottom:2px solid #333; font-weight:700; color:#000; }
+        .calc-message { margin-top:6px; color:#c0392b; font-weight:700; font-size:0.95em; min-height:1.1em; }
+
+        .footer { margin-top:30px; padding-top:15px; border-top:1px solid #ccc; font-size:1em; }
+        .important-notes { margin-top:20px; padding:15px; background-color:#fafafa; border:1px solid #eee; border-radius:5px; }
+        .important-notes h3 { margin-top:0; font-weight:700; }
+        .important-notes ul { list-style:none; padding-right:18px; padding-left:0; margin:0; direction:rtl; }
+        .important-notes li { margin-bottom:8px; font-size:0.95em; text-align:right; position:relative; padding-right:20px; font-weight: 700; }
+        .important-notes li::before { content: "•"; position:absolute; right:0; top:0.15em; font-size:1.1em; line-height:1; }
+
+        /* قسم البيانات الداخلية السري */
+        .internal-data {
+            background-color: #e8f4fd;
+            border: 2px dashed #3498db;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+        .internal-data h3 { margin-top: 0; color: #2980b9; font-size: 1.1em; }
+
+        .action-buttons { display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:25px; }
+        .action-btn { padding:12px; font-family:'Tajawal', sans-serif; font-size:1.05em; font-weight:700; border:none; border-radius:8px; cursor:pointer; }
+        #printButton { background-color:#3498db; color:white; }
+        #downloadButton { background-color:#2ecc71; color:white; display:flex; justify-content:center; align-items:center; gap:8px; }
+        .action-btn:hover { filter:brightness(0.95); }
+        #downloadSpinner { display:none; width:18px; height:18px; border:3px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg);} }
+
+        /* العناصر الثابتة للالتقاط والطباعة */
+        .capture-span {
+            display: none;
+            font-family: 'Tajawal', 'Arial', sans-serif;
+            font-size: 1em;
+            padding: 4px 6px;
+            border-bottom: 2px dotted #888;
+            min-height: 1.5em;
+            line-height: 1.6;
+            direction: rtl;
+            width: 100%;
+        }
+        .form-row .capture-span {
+            padding: 6px 6px;
+            border-bottom: 2px dotted #555;
+            flex-grow: 1;
+            width: auto;
+        }
+        #remainingAmountCapture {
+            background-color: #f4f4f4;
+            border-bottom: 2px solid #333;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .is-capturing input[type="text"],
+        .is-capturing input[type="number"] { display: none !important; }
+        .is-capturing .capture-span { display: block; }
+        .is-capturing .form-row .capture-span { display: block; flex-grow: 1; }
+        
+        /* إخفاء الأزرار والقسم السري عند التقاط الصورة */
+        .hide-controls .action-buttons,
+        .hide-controls .internal-data { display: none !important; visibility: hidden !important; }
+
+        @media print {
+            body { background-color:#fff; padding:0; margin:0; }
+            .receipt-container { box-shadow:none; border:none; width:100%; max-width:100%; }
+            .title-box span { background-color:#000 !important; color:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+            /* إخفاء الأزرار والقسم السري في الطباعة */
+            .action-buttons, .internal-data { display:none !important; }
+            
+            input[type="text"], input[type="number"] { display: none !important; }
+            .capture-span { display: block !important; }
+            .form-row .capture-span { display: block !important; flex-grow: 1; }
+        }
+        @media (max-width:720px){
+            .header { flex-direction:column; align-items:center; gap:12px; }
+            .whatsapp-numbers { text-align:center; }
+            .column { width:100%; }
+            .receipt-info { flex-direction:column; gap:10px; }
+            .action-buttons { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receipt-container" id="receiptToDownload">
+        <div class="header">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?data=https%3A%2F%2Fwww.facebook.com%2Fprofile.php%3Fid%3D100071674834703&size=90x90&qzone=1" alt="QR Code" class="qr-code-image">
+            
+            <div class="logo">
+                <h1>
+                    <svg class="icon" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M4 4h3l2-2h6l2 2h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm8 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10z"/>
+                        <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                    </svg>
+                    Mohamed Farouk
+                </h1>
+                <span>Photography</span>
+            </div>
+            <div class="whatsapp-numbers">
+                <div>
+                    <span class="phone-number">0 1 1 1 3 1 6 2 0 5 3</span>
+                </div>
+                <div>
+                    <span class="phone-number">0 1 0 9 6 7 8 3 4 6 9</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="receipt-info">
+            <div class="field">
+                <label for="receiptId">رقم الإيصال:</label>
+                <input type="text" id="receiptId" placeholder="جاري التحميل..." readonly style="font-weight: bold; background: transparent;">
+                <span class="capture-span" id="receiptIdCapture"></span>
+            </div>
+            <div class="field">
+                <label for="issueDate">تاريخ التحرير:</label>
+                <input type="text" id="issueDate">
+                <span class="capture-span" id="issueDateCapture"></span>
+            </div>
+        </div>
+
+        <div class="title-box">
+            <span>إيصال حجز</span>
+        </div>
+
+        <div class="content">
+            <div class="column">
+                <div class="form-row">
+                    <label for="clientName">اسم العميل:</label>
+                    <input type="text" id="clientName" placeholder="اكتب اسم العميل هنا">
+                    <span class="capture-span" id="clientNameCapture"></span>
+                </div>
+                <div class="form-row">
+                    <label for="clientPhone1">الهاتف (1):</label>
+                    <input type="text" id="clientPhone1">
+                    <span class="capture-span" id="clientPhone1Capture"></span>
+                </div>
+                <div class="form-row">
+                    <label for="clientPhone2">الهاتف (2):</label>
+                    <input type="text" id="clientPhone2">
+                    <span class="capture-span" id="clientPhone2Capture"></span>
+                </div>
+                <div class="form-row">
+                    <label for="offerDetails">العرض:</label>
+                    <input type="text" id="offerDetails">
+                    <span class="capture-span" id="offerDetailsCapture"></span>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="form-row">
+                    <label for="occasionType">المناسبة:</label>
+                    <input type="text" id="occasionType">
+                    <span class="capture-span" id="occasionTypeCapture"></span>
+                </div>
+                <div class="form-row">
+                    <label for="eventDate">تاريخ المناسبة:</label>
+                    <input type="text" id="eventDate">
+                    <span class="capture-span" id="eventDateCapture"></span>
+                </div>
+                <div class="form-row">
+                    <label for="totalAmount">المبلغ الكلي:</label>
+                    <input type="number" id="totalAmount" step="0.01">
+                    <span class="capture-span" id="totalAmountCapture"></span>
+                </div>
+                <div class="form-row">
+                    <label for="depositAmount">العربون:</label>
+                    <input type="number" id="depositAmount" step="0.01">
+                    <span class="capture-span" id="depositAmountCapture"></span>
+                </div>
+                <div class="form-row">
+                    <label for="remainingAmount">المبلغ المتبقي:</label>
+                    <input type="text" id="remainingAmount" readonly>
+                    <span class="capture-span" id="remainingAmountCapture"></span>
+                </div>
+                <div class="calc-message" id="calcMessage"></div> 
+            </div>
+        </div>
+
+        <div class="form-row" style="margin-top:15px;">
+            <label for="shootingLocation">مكان التصوير:</label>
+            <input type="text" id="shootingLocation">
+            <span class="capture-span" id="shootingLocationCapture"></span>
+        </div>
+
+        <div class="footer">
+            <div class="important-notes">
+                <h3>ملحوظات هامة:</h3>
+                <ul>
+                    <li>لا يتم تأكيد الحجز إلا بدفع العربون.</li>
+                    <li>العربون غير قابل للاسترجاع نهائيًا.</li>
+                    <li>يُدفع المبلغ المتبقي بالكامل بعد انتهاء التصوير مباشرة.</li>
+                    <li>أي تأخير سيتم احتساب 200 ج غرامة تأخير للساعة الواحده.</li>
+                </ul>
+            </div>
+
+            <div class="internal-data">
+                <h3>🔒 بيانات خاصة بالإدارة</h3>
+                <div class="content">
+                    <div class="column">
+                        <div class="form-row">
+                            <label for="photographerName">اسم المصور:</label>
+                            <input type="text" id="photographerName">
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="form-row">
+                            <label for="printCost">تكلفة الطباعة:</label>
+                            <input type="number" id="printCost" step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button id="printButton" class="action-btn" type="button">طباعة الإيصال</button>
+                <button id="downloadButton" class="action-btn" type="button">تنزيل كصورة <span id="downloadSpinner"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+    (function(){
+        const totalAmountInput = document.getElementById('totalAmount');
+        const depositAmountInput = document.getElementById('depositAmount');
+        const remainingAmountInput = document.getElementById('remainingAmount');
+        const issueDateInput = document.getElementById('issueDate');
+        const printButton = document.getElementById('printButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const spinner = document.getElementById('downloadSpinner');
+        const receiptIdInput = document.getElementById('receiptId');
+        const calcMessage = document.getElementById('calcMessage');
+        const receiptContainer = document.getElementById('receiptToDownload');
+
+        if (receiptIdInput) {
+            let nextId = localStorage.getItem('MFP_NextReceiptId');
+            receiptIdInput.value = (nextId && !isNaN(nextId)) ? parseInt(nextId) : 1001;
+        }
+
+        function parseNumberFromValue(val){
+            if (typeof val === 'number') return isFinite(val) ? val : 0;
+            if (!val) return 0;
+            const normalized = String(val).replace(/،/g, '.').replace(/,/g, '.').replace(/[^\d.]/g, '').trim();
+            const parsed = parseFloat(normalized);
+            return isFinite(parsed) ? parsed : 0;
+        }
+
+        const currencyFormatter = new Intl.NumberFormat('ar-EG', { 
+            minimumFractionDigits: 0, 
+            maximumFractionDigits: 0,
+            numberingSystem: 'latn',
+            useGrouping: false
+        });
+
+        try {
+            if (issueDateInput) {
+                issueDateInput.value = new Date().toLocaleDateString('ar-EG', { day:'2-digit', month:'2-digit', year:'numeric' });
+            }
+        } catch(e) {}
+
+        function calculateRemaining(){
+            const total = parseNumberFromValue(totalAmountInput.value);
+            const deposit = parseNumberFromValue(depositAmountInput.value);
+            const remaining = total - deposit;
+            // العرض للمستخدم يظل بكلمة "ج.م"
+            remainingAmountInput.value = currencyFormatter.format(remaining);
+        }
+
+        [totalAmountInput, depositAmountInput].forEach(el => {
+            if (el) el.addEventListener('input', calculateRemaining);
+        });
+
+        function syncInputsToSpans() {
+            const inputsToCapture = ['receiptId', 'issueDate', 'clientName', 'offerDetails', 'totalAmount', 'occasionType', 'eventDate', 'depositAmount', 'remainingAmount', 'clientPhone1', 'clientPhone2', 'shootingLocation'];
+            inputsToCapture.forEach(id => {
+                const input = document.getElementById(id);
+                const span = document.getElementById(id + 'Capture');
+                if (input && span) span.textContent = input.value || '\u00A0';
+            });
+        }
+
+        downloadButton.addEventListener('click', async () => {
+            const phone1 = document.getElementById('clientPhone1')?.value || '';
+            const phone2 = document.getElementById('clientPhone2')?.value || '';
+            const finalPhone = phone2 ? phone1 + ' / ' + phone2 : phone1;
+
+            const totalNum = parseNumberFromValue(totalAmountInput.value);
+            const depositNum = parseNumberFromValue(depositAmountInput.value);
+            const remainingNum = parseNumberFromValue(remainingAmountInput.value); // استخراج الرقم فقط
+            const printCostNum = parseNumberFromValue(document.getElementById('printCost')?.value);
+
+            // الحسبة المطلوبة (باقي - طباعة)
+            const netProfit = remainingNum - printCostNum;
+
+            const payload = {
+                receiptId: document.getElementById('receiptId')?.value || '',
+                clientName: document.getElementById('clientName')?.value || '',
+                phone: finalPhone,
+                occasion: document.getElementById('occasionType')?.value || '',
+                eventDate: document.getElementById('eventDate')?.value || '',
+                location: document.getElementById('shootingLocation')?.value || '',
+                // --- التعديل هنا: نرسل أرقام صافية فقط للإكسيل ---
+                totalAmount: totalNum.toString(),
+                deposit: depositNum.toString(),
+                remaining: remainingNum.toString(), 
+                photographer: document.getElementById('photographerName')?.value || '',
+                printCost: printCostNum.toString(),
+                netProfit: netProfit.toString()
+            };
+
+            fetch('https://script.google.com/macros/s/AKfycbzkrAZ_WMU6-6UqffVL_Y7pFQVcL_vclZ1COxbUkr6zJL4kjidyj7muvtk__1nLAYyX/exec', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            syncInputsToSpans();
+            receiptContainer.classList.add('hide-controls', 'is-capturing');
+            await new Promise(r =>
+requestAnimationFrame(() =>
+requestAnimationFrame(r)
+));
+            if(spinner) spinner.style.display = 'inline-block';
+            downloadButton.disabled = true;
+
+            try {
+                const canvas = await html2canvas(receiptContainer, {
+    scale: window.devicePixelRatio || 2,
+    backgroundColor: '#ffffff',
+    useCORS: true,
+    allowTaint: true,
+    scrollX: 0,
+    scrollY: -window.scrollY,
+    windowWidth: 750,
+    windowHeight: receiptContainer.scrollHeight
+});
+                const link = document.createElement('a');
+                link.download = `MohamedFarouk-Receipt-${payload.receiptId}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                localStorage.setItem('MFP_NextReceiptId', parseInt(payload.receiptId) + 1);
+                receiptIdInput.value = parseInt(payload.receiptId) + 1;
+            } finally {
+                receiptContainer.classList.remove('hide-controls', 'is-capturing');
+                if(spinner) spinner.style.display = 'none';
+                downloadButton.disabled = false;
+            }
+        });
+
+        printButton.addEventListener('click', () => {
+            syncInputsToSpans();
+            receiptContainer.classList.add('is-capturing');
+            window.print();
+            receiptContainer.classList.remove('is-capturing');
+        });
+        
+        calculateRemaining();
+    })();
+    </script>
+</body>
+</html>
