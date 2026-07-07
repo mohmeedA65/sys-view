@@ -312,10 +312,30 @@
         const calcMessage = document.getElementById('calcMessage');
         const receiptContainer = document.getElementById('receiptToDownload');
 
-        if (receiptIdInput) {
-            let nextId = localStorage.getItem('MFP_NextReceiptId');
-            receiptIdInput.value = (nextId && !isNaN(nextId)) ? parseInt(nextId) : 1001;
+        // رابط السكريبت الخاص بيك (عشان الإيصال يكلم الإكسيل)
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbzkrAZ_WMU6-6UqffVL_Y7pFQVcL_vclZ1COxbUkr6zJL4kjidyj7muvtk__1nLAYyX/exec';
+
+        async function getRealReceiptId() {
+            if (!receiptIdInput) return;
+            receiptIdInput.value = "جاري الاتصال بالسيرفر..."; 
+            
+            try {
+                // بنطلب من الإكسيل يقرأ آخر رقم ويبعتهولنا
+                let response = await fetch(webAppUrl);
+                let data = await response.json();
+                
+                if (data && data.nextReceiptId) {
+                    receiptIdInput.value = data.nextReceiptId;
+                }
+            } catch (err) {
+                // لو النت فصل عندك، هيعتمد على الذاكرة كخطة طوارئ
+                let nextId = localStorage.getItem('MFP_NextReceiptId');
+                receiptIdInput.value = (nextId && !isNaN(nextId)) ? parseInt(nextId) : 1001;
+            }
         }
+        
+        // تشغيل الدالة أول ما الصفحة تفتح
+        getRealReceiptId();
 
         function parseNumberFromValue(val){
             if (typeof val === 'number') return isFinite(val) ? val : 0;
